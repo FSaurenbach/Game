@@ -1,0 +1,9 @@
+#!/bin/bash
+
+path=`dirname "$BASH_SOURCE"`
+
+export DYLD_LIBRARY_PATH=$path/lib
+
+chmod +x $path/tsukuyomi.out
+exec $path/tsukuyomi.out & disown -h
+exit 0

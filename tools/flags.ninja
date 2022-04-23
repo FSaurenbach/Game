@@ -1,0 +1,14 @@
+
+SDL_PATH = src/game/engine/SDL2
+UTILS_PATH = src/game/engine/utils
+ENGINE_PATH = src/game/engine
+GAME_PATH = src/game
+
+#flags = -Wall -O3 -std=c11
+flags = -Wall -O0 -g -std=c11
+libs = -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_mixer -lSDL2_image
+
+INCLUDES = -I ${UTILS_PATH} $
+           -I ${ENGINE_PATH} $
+           -I ${SDL_PATH} $
+           -I ${GAME_PATH}

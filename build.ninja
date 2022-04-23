@@ -1,0 +1,21 @@
+include ./config.ninja
+include ./tools/flags.ninja
+include ./tools/${PLATFORM}.ninja
+include ./tools/${TARGET}.ninja
+
+#### external libs 
+build ${OBJ_PATH}/utils.obj: CC ${UTILS_PATH}/utils.c
+build ${OBJ_PATH}/utils.a:   AR ${OBJ_PATH}/utils.obj
+
+###### main game + engine
+
+# link all .as
+
+
+build ${OUT}: LINK ${OBJ_PATH}/program.a ${OBJ_PATH}/utils.a
+
+build app: phony ${OUT}
+
+default app
+
+
