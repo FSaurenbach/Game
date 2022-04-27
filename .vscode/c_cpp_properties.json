@@ -1,0 +1,21 @@
+{
+    "env": {
+        "myDefaultIncludePath": ["${workspaceFolder}/src/game", "${workspaceFolder}/src/game/engine", "${workspaceFolder}/src/game/engine/utils", "${workspaceFolder}/src/game/engine/SDL2", "${workspaceFolder}/src/game/states/behaviours"],
+        "myCompilerPath": "/usr/local/bin/gcc-7"
+      },
+      "configurations": [
+        {
+          "intelliSenseMode": "clang-x64",
+          "includePath": ["${myDefaultIncludePath}"],
+          "compilerPath": "/usr/bin/clang",
+          "cStandard": "c11",
+          "browse": {
+            "path": ["${workspaceFolder}/*"],
+            "limitSymbolsToIncludedHeaders": true,
+            "databaseFilename": ""
+          }
+        }
+      ],
+      "version": 4
+
+}

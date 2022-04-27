@@ -203,7 +203,7 @@
     // Make sure the acceleration is in negative for the y
     void gsdl_create_phys_obj(gsdl_phys_obj_t * obj, v2_t pos, v2_t acc, u16 w, u16 h);
     // Static object list collisions
-    void gsdl_update_phys_obj_vel(gsdl_phys_obj_t * obj);
+    void gsdl_update_phys_obj_vel(gsdl_phys_obj_t * obj, u08 vel_reset_already);
     void gsdl_update_phys_obj_pos(gsdl_phys_obj_t * o1, const gsdl_phys_obj_t * o2, const u32 o2_len);
     /*
     ////////////////////////////////
@@ -290,10 +290,5 @@
     void gsdl_update_particles(gsdl_particles_t * particles, i32 r, i32 g, i32 b, i32 a, u08 spawn, i32 cx, i32 cy, i32 w, i32 h, u08 f, i32 rad_min, i32 rad_max);
     void gsdl_draw_particles(gsdl_particles_t * particles, gsdl_cam_t * cam, SDL_Renderer * renderer);
     void gsdl_destroy_particles(gsdl_particles_t * particles);
-
-    typedef struct {
-        v2_t pos;
-        v2_t vel;
-    } gsdl_projectile_t;
 
 #endif

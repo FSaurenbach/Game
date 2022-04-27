@@ -21,6 +21,7 @@ i32 main(i32 argv, char ** args) {
     file_info_t f = txt_file_query("res/obj.txt");
     i32 tiles = str_to_i32(&f.content[0]);
 
+    // f.content++;
     i32 idxToDel = 0; 
     memmove(&f.content[idxToDel], &f.content[idxToDel + 1], strlen(f.content) - idxToDel);
     for (i32 i = 0; i < strlen(f.content); i++) {

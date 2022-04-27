@@ -2,8 +2,9 @@
 
 path=`dirname "$BASH_SOURCE"`
 
-export DYLD_LIBRARY_PATH=$path/lib
+cd $path
+export DYLD_LIBRARY_PATH=./lib
 
-chmod +x $path/tsukuyomi.out
-exec $path/tsukuyomi.out & disown -h
+chmod +x ./game.out
+exec ./game.out & disown -h
 exit 0

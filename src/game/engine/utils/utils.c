@@ -1,4 +1,4 @@
-#include "./utils.h"
+#include <utils.h>
 
 i08 file_exists(const char * path) {
     assert(path != NULL);
@@ -21,7 +21,7 @@ file_info_t txt_file_query(const char * path) {
     assert(fseek(f, 0, SEEK_END) == 0);
 
     file.len = ftell(f);
-    assert(file.len > -1);
+    assert(file.len != 0);
 
     file.content = calloc(file.len + 1, sizeof(char));
     assert(file.content != NULL);

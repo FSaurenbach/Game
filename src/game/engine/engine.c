@@ -1,4 +1,4 @@
-#include "./engine.h"
+#include <engine.h>
 
 void gsdl_init(const gsdl_init_info_t init, gsdl_props_t * props) {
     { // SDL Init
@@ -350,8 +350,10 @@ void gsdl_create_phys_obj(gsdl_phys_obj_t * obj, v2_t pos, v2_t acc, u16 w, u16 
     obj -> h = h;
 }
 
-void gsdl_update_phys_obj_vel(gsdl_phys_obj_t * obj) {
-    obj -> vel = mk_v2_zero();
+void gsdl_update_phys_obj_vel(gsdl_phys_obj_t * obj, u08 vel_reset_already) {
+    if (!vel_reset_already) {
+        obj -> vel = mk_v2_zero();
+    }
     if (obj -> move_r) {
         obj -> vel.x += obj -> acc.x;
     }
@@ -380,14 +382,14 @@ void gsdl_update_phys_obj_pos(gsdl_phys_obj_t * o1, const gsdl_phys_obj_t * o2, 
         for (u32 i = 0; i < o2_len; i++) {
             if (gsdl_phys_obj_coll_detect((*o1), o2[i])) {
                 if (o1 -> vel.x > 0) {
-                    o1 -> pos.x -= o1 -> acc.x;
+                    o1 -> pos.x -= o1 -> vel.x;
                     /* if collision breaks, do while loop and subtract */
                     o1 -> coll_r = 1;
                     o1 -> coll_l = 0;
                 }
 
                 else if (o1 -> vel.x < 0) {
-                    o1 -> pos.x += o1 -> acc.x;
+                    o1 -> pos.x -= o1 -> vel.x;
                     o1 -> coll_r = 0;
                     o1 -> coll_l = 1;
                 } 
@@ -403,14 +405,14 @@ void gsdl_update_phys_obj_pos(gsdl_phys_obj_t * o1, const gsdl_phys_obj_t * o2, 
         for (u32 i = 0; i < o2_len; i++) {
             if (gsdl_phys_obj_coll_detect((*o1), o2[i])) {
                 if (o1 -> vel.y > 0) {
-                    o1 -> pos.y -= o1 -> y_momentum;
+                    o1 -> pos.y -= o1 -> vel.y;
                     //o1 -> pos.y += o1 -> acc.y;
                     o1 -> coll_b = 1;
                     o1 -> coll_t = 0;
                 }
 
                 else if (o1 -> vel.y < 0) {
-                    o1 -> pos.y += fabsf(o1 -> y_momentum);
+                    o1 -> pos.y += fabsf(o1 -> vel.y);
                     //o1 -> pos.y -= o1 -> acc.y;
                     o1 -> coll_b = 0;
                     o1 -> coll_t = 1;
@@ -795,6 +797,9 @@ void gsdl_draw_particles(gsdl_particles_t * particles, gsdl_cam_t * cam, SDL_Ren
     }
 }
 
-void gsdl_destroy_particles(gsdl_particles_t * particles);
-
+void gsdl_destroy_particles(gsdl_particles_t * particles) {
+    free(particles -> arr);
+    particles -> size = 0;
+    particles -> delta = 0;
+}
 
