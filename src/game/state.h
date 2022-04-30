@@ -8,23 +8,23 @@
     #define W_HALF       WIDTH/2 
     #define H_HALF       HEIGHT/2
     #define RENDERER_ACC 1
-    #define FPS          60 
+    #define FPS          65 
     #define VSYNC        1
     #define RESIZABLE    1 
+
+    #define MAX_MS_SIZE 40
+    #define MAX_MEM_USED 120
 
     // implement rerun init function
     #define ARGS (gsdl_init_info_t) { TITLE, WIDTH, HEIGHT, RENDERER_ACC, FPS, VSYNC, RESIZABLE }
 
-    #define PLAYER_STATES 4
+    #define PLAYER_STATES 2
     #define MAX_Y_MOMENTUM 12
     #define SPAWN_POS (v2_t) { 600, 200 }
     #define ASPECT_RATIO (f32) WIDTH/HEIGHT
     #define PSX 40 * (0.75 * ASPECT_RATIO)
     #define TSX 64 * (0.75 * ASPECT_RATIO)
     #define TSY 64 * (0.75 * ASPECT_RATIO)
-
-    #define MAX_MS_SIZE 40 
-    #define MAX_MEM_USED 120
 
     #define GHOST_LIST_SIZE 7 
 
@@ -40,7 +40,6 @@
         gsdl_phys_obj_t render_texture_obj;
         gsdl_phys_obj_t mouse;
 
-        // fps
         char * integer_str;
         char * final_dbg_str;
 
@@ -51,6 +50,8 @@
         // Menu
         gsdl_ui_label_t game_name;
         gsdl_ui_label_t press_to_play;
+
+        // Debug
         gsdl_ui_label_t frame_time_label;
         SDL_Texture * frame_time_textures[MAX_MS_SIZE];
         gsdl_ui_label_t mem_used_label;
@@ -98,9 +99,6 @@
         u08 current_map;
         u32 coin_count_for_level[10];
         u32 coins_collected;
-
-//        gsdl_phys_obj_t tiles[150];
-//        gsdl_phys_obj_t tile_shadow[150];
 
         gsdl_img_t square_texture[30];
         gsdl_phys_obj_t square[30];

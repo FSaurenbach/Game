@@ -1,22 +1,24 @@
 #include <behaviours.h>
 
 void player_init(game_state_t * state, gsdl_props_t * props) {
-    state -> player_img_data = calloc(4, sizeof(gsdl_anim_data_t));
+    state -> player_img_data = calloc(5, sizeof(gsdl_anim_data_t));
     state -> player_img_data[0] = (gsdl_anim_data_t) { "idle", "res/player/idle/", 2, 30, 0 };
     state -> player_img_data[1] = (gsdl_anim_data_t) { "run", "res/player/run/", 4, 5, 0 };
     state -> player_img_data[2] = (gsdl_anim_data_t) { "power", "res/player/power/", 2, 30, 0 };
     state -> player_img_data[3] = (gsdl_anim_data_t) { "jump", "res/player/jump/", 1, 0, 0 };
+    state -> player_img_data[4] = (gsdl_anim_data_t) { "shoot", "res/player/shoot/", 1, 0, 0 };
 
-    state -> player_prev_img_data = calloc(4, sizeof(gsdl_anim_data_t));
-    state -> player_prev_img_data[0] = (gsdl_anim_data_t) { "idle", "res/player/idle/", 1, 30, 0 };
-    state -> player_prev_img_data[1] = (gsdl_anim_data_t) { "run", "res/player/run/", 1, 30, 0 };
-    state -> player_prev_img_data[2] = (gsdl_anim_data_t) { "power", "res/player/power/", 1, 30, 0 };
-    state -> player_prev_img_data[3] = (gsdl_anim_data_t) { "jump", "res/player/jump/", 1, 0, 0 };
-
-    gsdl_init_animated_img(&state -> player_anim_img, state -> player_img_data, 4);
-    gsdl_init_animated_img(&state -> player_prev_img, state -> player_prev_img_data, 4);
-
+    gsdl_init_animated_img(&state -> player_anim_img, state -> player_img_data, 5);
     gsdl_load_animations(&state -> player_anim_img, props -> renderer, &props -> texture_storage, &props -> ptr_storage, 255);
+
+    state -> player_prev_img_data = calloc(5, sizeof(gsdl_anim_data_t));
+    state -> player_prev_img_data[0] = (gsdl_anim_data_t) { "idle", "res/player/idle/", 1, 0, 0 };
+    state -> player_prev_img_data[1] = (gsdl_anim_data_t) { "run", "res/player/run/", 1, 0, 0 };
+    state -> player_prev_img_data[2] = (gsdl_anim_data_t) { "power", "res/player/power/", 1, 0, 0 };
+    state -> player_prev_img_data[3] = (gsdl_anim_data_t) { "jump", "res/player/jump/", 1, 0, 0 };
+    state -> player_prev_img_data[4] = (gsdl_anim_data_t) { "shoot", "res/player/shoot/", 1, 0, 0 };
+
+    gsdl_init_animated_img(&state -> player_prev_img, state -> player_prev_img_data, 5);
     gsdl_load_animations(&state -> player_prev_img, props -> renderer, &props -> texture_storage, &props -> ptr_storage, 60);
 
     state -> curr_ghost = 0;
@@ -59,7 +61,7 @@ void player_handle_events(game_state_t * state, gsdl_props_t * props) {
 
     if (props -> keys_pressed[SDL_SCANCODE_S] || props -> keys_pressed[SDL_SCANCODE_DOWN]) {
         // fix problem with smaller squares not being registered
-        if (state -> player_shoot_delay < 8 && state -> player_shoot_keyup <= 1) {
+        if (state -> player_shoot_delay < 8 && state -> player_shoot_keyup <= 1 && !(!state -> player.coll_b && state -> player_air_timer > 0.25 && (state -> player.y_momentum > 0.75 * 10 || state -> player.y_momentum < 0))) {
             state -> player.move_l = 0;
             state -> player.move_r = 0;
             state -> player.move_b = 0;
@@ -113,7 +115,10 @@ void player_handle_events(game_state_t * state, gsdl_props_t * props) {
         }
     }
     else {
-        state -> player_dash_timer -= 0.025;
+        state -> player_dash_timer -= 0.005;
+        if (state -> player_dash_timer < 0) {
+            state -> player_dash_timer = 0;
+        }
     }
 }
 
@@ -145,6 +150,20 @@ void player_update(game_state_t * state, gsdl_props_t * props) {
 
 
     gsdl_update_particles(&state -> player_particles, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+    if (state -> player_shooting) {
+        i32 cx = state -> bullets[state -> bullet_len].pos.x - state -> camera.x;
+        i32 cy = state -> bullets[state -> bullet_len].pos.y - state -> camera.y;
+        state -> player_shoot_delay += 0.25;
+        if (state -> player_shoot_delay >= 8) {
+            gsdl_set_animation_state(&state -> player_anim_img, "shoot");
+            gsdl_set_animation_state(&state -> player_prev_img, "shoot");
+            state -> player_shooting = 0;
+            gsdl_create_circle(&state -> bullet_circle, cx + 25, cy, 25, 255, 255, 255, 255, 1);
+            gsdl_create_circle(&state -> bullet_circle_outline, cx + 25, cy, state -> bullet_circle.rad + 4, 255, 100, 150, 255, 1);
+        }
+    }
+
     gsdl_update_phys_obj_pos(&state -> player, state -> lvls[state -> current_map].coll_tiles, state -> lvls[state -> current_map].tile_len);
 
     if ((state -> player.vel.x < 0 || state -> player.vel.x > 0) && state -> player.y_momentum == 0 && state -> player_air_timer == 0) {
@@ -227,32 +246,13 @@ void player_update(game_state_t * state, gsdl_props_t * props) {
         }
     }
 
-    if (state -> player_shooting) {
-        i32 cx = state -> bullets[state -> bullet_len].pos.x - state -> camera.x;
-        i32 cy = state -> bullets[state -> bullet_len].pos.y - state -> camera.y;
-        state -> player_shoot_delay += 0.25;
-        if (state -> player_shoot_delay >= 8) {
-            gsdl_set_animation_state(&state -> player_anim_img, "idle");
-            gsdl_set_animation_state(&state -> player_prev_img, "idle");
-            state -> player_shooting = 0;
-            if (state -> bullets[state -> bullet_len].move_l) {
-                state -> player.pos.x += 10;
-            }
-            if (state -> bullets[state -> bullet_len].move_r) {
-                state -> player.pos.x -= 10;
-            }
-            gsdl_create_circle(&state -> bullet_circle, cx + 25, cy, 25, 255, 255, 255, 255, 1);
-            gsdl_create_circle(&state -> bullet_circle_outline, cx + 25, cy, state -> bullet_circle.rad + 4, 255, 100, 150, 255, 1);
-        }
-    }
-
     if (state -> bullet_circle.rad > 0) {
         if (state -> circle_timer >= 0.5) {
             state -> bullet_circle.rad = -10;
             state -> bullet_circle_outline.rad = -10;
             state -> circle_timer = 0;
         } else {
-            state -> circle_timer += 0.05;
+            state -> circle_timer += 0.1;
         }
     }
 
@@ -278,6 +278,7 @@ void player_render(game_state_t * state, gsdl_props_t * props) {
         gsdl_set_img_alpha((&state -> bullet_texture), state -> bullet_alpha[u]);
         gsdl_draw_phys_obj(&state -> bullet_texture, &obj, &state -> camera, props -> renderer);
     }  
+
     gsdl_draw_circle(&state -> bullet_circle_outline, props -> renderer);
     gsdl_draw_circle(&state -> bullet_circle, props -> renderer);
 

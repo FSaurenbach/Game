@@ -20,8 +20,6 @@ void main_handle_events(gsdl_props_t * props, game_state_t * state) {
 }
 
 void main_update(gsdl_props_t * props, game_state_t * state) {
-    SDL_SetRenderTarget(props -> renderer, state -> render_texture.tex);
-
     lvl_update(state, props);
     player_update(state, props);
     // break up frame counting and animation
@@ -62,7 +60,7 @@ void main_render(gsdl_props_t * props, game_state_t * state) {
             state -> frame_time_label.label_text = "Frame Time Is TOO High (> 35ms)";
             state -> frame_time_textures[MAX_MS_SIZE - 1] = SDL_CreateTextureFromSurface(props -> renderer, TTF_RenderText_Blended(state -> frame_time_label.label_font, state -> frame_time_label.label_text, state -> frame_time_label.text_color));
         }
-
+ 
         if (props -> dt < MAX_MS_SIZE && state -> frame_time_textures[props -> dt] == 0x0) {
             state -> frame_time_label.label_text = state -> final_dbg_str;
             state -> frame_time_textures[props -> dt] = SDL_CreateTextureFromSurface(props -> renderer, TTF_RenderText_Blended(state -> frame_time_label.label_font, state -> frame_time_label.label_text, state -> frame_time_label.text_color));
@@ -70,7 +68,7 @@ void main_render(gsdl_props_t * props, game_state_t * state) {
         state -> saved_dt_avg = props -> dt;
         changed_frame_time = 1;
     } 
-
+ 
     memset(state -> final_dbg_str, 0, strlen(state -> final_dbg_str));
     i32 changed_mem_usage = 0;
     state -> saved_mem_usage = props -> mb_used;
@@ -80,7 +78,7 @@ void main_render(gsdl_props_t * props, game_state_t * state) {
             state -> mem_used_label.label_text = "Mem Usage TOO High (> 120mb)";
             state -> mem_used_textures[MAX_MEM_USED - 1] = SDL_CreateTextureFromSurface(props -> renderer, TTF_RenderText_Blended(state -> mem_used_label.label_font, state -> mem_used_label.label_text, state -> mem_used_label.text_color));
         }
-
+ 
         if (props -> mb_used < MAX_MEM_USED && state -> mem_used_textures[props -> mb_used] == 0x0) {
             state -> mem_used_label.label_text = state -> final_dbg_str;
             state -> mem_used_textures[props -> mb_used] = SDL_CreateTextureFromSurface(props -> renderer, TTF_RenderText_Blended(state -> mem_used_label.label_font, state -> final_dbg_str, state -> mem_used_label.text_color));
@@ -89,6 +87,7 @@ void main_render(gsdl_props_t * props, game_state_t * state) {
         changed_mem_usage = 1;
         state -> f_count++;
     } 
+
     gsdl_start_render(props, 60, 30, 34, 255, state -> render_texture.tex);
     { // Main rendering stuff   
 
@@ -106,29 +105,28 @@ void main_render(gsdl_props_t * props, game_state_t * state) {
             state -> frame_time_label.label_tex = state -> frame_time_textures[props -> dt];   
             SDL_QueryTexture(state -> frame_time_label.label_tex, NULL, NULL, &state -> frame_time_label.pos.w, &state -> frame_time_label.pos.h);
         }
-
+ 
         gsdl_draw_ui_label(&state -> frame_time_label, props -> renderer);
-
+ 
         if (changed_mem_usage) {
             state -> mem_used_label.label_tex = state -> mem_used_textures[props -> mb_used];
             SDL_QueryTexture(state -> mem_used_label.label_tex, NULL, NULL, &state -> mem_used_label.pos.w, &state -> mem_used_label.pos.h);
         }
-
+ 
         gsdl_draw_ui_label(&state -> mem_used_label, props -> renderer);
         memset(state -> final_dbg_str, 0, strlen(state -> final_dbg_str));
-
     }
     gsdl_end_render(props);
     gsdl_render_all(props, cBLACK, &state -> render_texture, &state -> render_texture_obj, NULL, 1, WIDTH, HEIGHT);
 }
 void main_loop(gsdl_props_t * props, game_state_t * state) { 
+        // Handle events
+        main_handle_events(props, state);
+        // Update
+        main_update(props, state);
     gsdl_start_frame_time_rec(props);
-    // Handle events
-    main_handle_events(props, state);
-    // Update
-    main_update(props, state);
-    // Rendering
-    main_render(props, state); 
+        // Rendering
+        main_render(props, state); 
     gsdl_stop_frame_time_rec(props);
 }
 

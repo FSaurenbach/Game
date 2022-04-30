@@ -56,17 +56,18 @@ void gsdl_init(const gsdl_init_info_t init, gsdl_props_t * props) {
         props -> dt = 0;
         memset(props -> avg_dt, 0, sizeof(props -> avg_dt));
         props -> curr_dt = 0;
-        props -> texture_storage = list_create(50);
-        props -> ptr_storage = list_create(50);
+        props -> texture_storage = list_create(75);
+        props -> ptr_storage = list_create(75);
     }
 }
 
 void gsdl_destroy(gsdl_props_t * props) {
+    // possible problems here
     for (u32 u = 0; u < props -> texture_storage.len; u++) {
         if (props -> texture_storage.data[u]) {
             SDL_DestroyTexture(props -> texture_storage.data[u]);
         }
-    }
+    } 
     free(props -> texture_storage.data);
     list_rm(&props -> ptr_storage);
 
@@ -265,7 +266,6 @@ void gsdl_load_animations(gsdl_animated_img_t * img, SDL_Renderer * renderer, li
             gsdl_set_img_alpha(((gsdl_img_t *) ht_get(&img -> animations, img -> data[u].name)), alpha);
         }
     }
-    list_insert(surf_storage, img -> state);
 } 
 
 void gsdl_set_animation_state(gsdl_animated_img_t * img, char * state) {
@@ -332,6 +332,7 @@ void gsdl_create_ui_label(gsdl_ui_label_t * label, i32 x, i32 y, char * text, ch
                                                                                        label -> label_text,
                                                                                        label -> text_color));
     SDL_QueryTexture(label -> label_tex, NULL, NULL, &label -> pos.w, &label -> pos.h);
+    // possible problems here
     list_insert(texture_storage, label -> label_tex);
     list_insert(font_storage, label -> label_font);
 }
@@ -438,6 +439,7 @@ void gsdl_calc_cam_pos(gsdl_cam_t * cam, gsdl_props_t * props, gsdl_phys_obj_t *
         u32 format;
         i32 access;
         SDL_QueryTexture(target, &format, &access, &w, &h);
+        // get render texture obj
     }
 
     cam -> x += (i32) round((o -> pos.x - cam -> x - ((w * 0.5) - (tsx * 0.5))) / 10);

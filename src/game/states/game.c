@@ -7,14 +7,15 @@ game_state_t * game_init(gsdl_props_t * props) {
     { // Game state initialization
         state = calloc(1, sizeof(game_state_t));
         state -> g_state = 0;
-        state -> integer_str = calloc(24, sizeof(char));
-        state -> final_dbg_str = calloc(64, sizeof(char));
         SDL_SetWindowMinimumSize(props -> win, WIDTH, HEIGHT);
         //SDL_SetWindowMaximumSize(props -> win, 2560, 1440);
+        state -> integer_str = calloc(24, sizeof(char));
+        state -> final_dbg_str = calloc(64, sizeof(char));
     }
 
     { // Actual game stuff
         //state -> player_animations;
+
     }
 
     { // Transition
@@ -30,16 +31,11 @@ game_state_t * game_init(gsdl_props_t * props) {
 
     { // Create menu UI
 
-        gsdl_create_ui_label(&state -> game_name, W_HALF, H_HALF - 100, TITLE, "./res/m5x7.ttf", cWHITE, 60, props -> renderer, &props -> texture_storage, &props -> ptr_storage);
+        gsdl_create_ui_label(&state -> game_name, W_HALF, H_HALF - 100, "UnR34lity", "./res/m5x7.ttf", cWHITE, 60, props -> renderer, &props -> texture_storage, &props -> ptr_storage);
         gsdl_center_ui_label(&state -> game_name);
 
         gsdl_create_ui_label(&state -> press_to_play, W_HALF, H_HALF, "Press Space to Play or Q to Quit", "./res/m5x7.ttf", cWHITE, 30, props -> renderer, &props -> texture_storage, &props -> ptr_storage);
         gsdl_center_ui_label(&state -> press_to_play);
-
-        gsdl_create_ui_label(&state -> frame_time_label, 60, 10, "Calculating AVG Frame Time...", "./res/m5x7.ttf", cWHITE, 30, props -> renderer, &props -> texture_storage, &props -> ptr_storage);
-        gsdl_create_ui_label(&state -> mem_used_label, 60, 30, "Calculating Memory Used (mb)...", "./res/m5x7.ttf", cWHITE, 30, props -> renderer, &props -> texture_storage, &props -> ptr_storage);
-        memset(state -> frame_time_textures, 0, MAX_MS_SIZE);
-        memset(state -> mem_used_textures, 0, MAX_MEM_USED);
 
         gsdl_create_circle(&state -> sharingan, W_HALF, H_HALF - 20, 148, 100, 30, 34, 255, 1);
         gsdl_create_circle(&state -> sharingan_tomoe[0], W_HALF, H_HALF - 20, 50, cBLACK, 1);
@@ -48,8 +44,11 @@ game_state_t * game_init(gsdl_props_t * props) {
         gsdl_create_circle(&state -> sharingan_tomoe[3], W_HALF + 64, H_HALF + 24, 20, cBLACK, 1);
     }
 
-    { // Create circle / Sharingan thingy 
-
+    { // Debug UI
+        gsdl_create_ui_label(&state -> frame_time_label, 60, 10, "Calculating AVG Frame Time...", "./res/m5x7.ttf", cWHITE, 30, props -> renderer, &props -> texture_storage, &props -> ptr_storage);
+        gsdl_create_ui_label(&state -> mem_used_label, 60, 30, "Calculating Memory Used (mb)...", "./res/m5x7.ttf", cWHITE, 30, props -> renderer, &props -> texture_storage, &props -> ptr_storage);
+        memset(state -> frame_time_textures, 0, MAX_MS_SIZE);
+        memset(state -> mem_used_textures, 0, MAX_MEM_USED);
     }
 
     { // Background Squares
@@ -88,8 +87,6 @@ void game_loop(gsdl_props_t * props, game_state_t * state) {
 }
 
 void game_cleanup(gsdl_props_t * props, game_state_t * state) {
-    free(state -> integer_str);
-    free(state -> final_dbg_str);
     // add to pointer stg
 
     gsdl_destroy(props);    

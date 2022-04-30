@@ -21,7 +21,6 @@ void menu_handle_events(gsdl_props_t * props, game_state_t * state) {
 }
 
 void menu_update(gsdl_props_t * props, game_state_t * state) {
-    SDL_SetRenderTarget(props -> renderer, state -> render_texture.tex);
     if (state -> transition - 1 == 0) {
         state -> transition_circle.rad += 40;
         if (state -> transition_circle.rad > WIDTH) {
@@ -54,13 +53,11 @@ void menu_render(gsdl_props_t * props, game_state_t * state) {
 }
 
 void menu_loop(gsdl_props_t * props, game_state_t * state) { 
-    gsdl_start_frame_time_rec(props);
     // Handle events
     menu_handle_events(props, state);
     // Update
     menu_update(props, state);
     // Rendering
     menu_render(props, state); 
-    gsdl_stop_frame_time_rec(props);
 }
 

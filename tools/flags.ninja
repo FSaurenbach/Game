@@ -6,7 +6,7 @@ GAME_PATH = src/game
 BEHAVIOURS_PATH = src/game/states/behaviours
 
 #flags = -Wall -O3 -std=c11
-flags = -Wall -O0 -g -std=c11
+flags = -Wall -g -O0 -std=c99
 libs = -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_mixer -lSDL2_image
 
 INCLUDES = -I ${UTILS_PATH} $
