@@ -280,6 +280,9 @@
     ////////////////////////////////
     */
 
+    void gsdl_color_px(SDL_Surface * surf, i32 x, i32 y, u08 r, u08 g, u08 b);
+    SDL_Color gsdl_get_px_color(SDL_Surface * surf, i32 x, i32 y);
+
     typedef struct {
         gsdl_circle_t * arr;
         u32 size;
@@ -291,4 +294,16 @@
     void gsdl_draw_particles(gsdl_particles_t * particles, gsdl_cam_t * cam, SDL_Renderer * renderer);
     void gsdl_destroy_particles(gsdl_particles_t * particles);
 
+    typedef struct {
+        i16 * grid;
+        u16 size[2];
+        u16 actual_size;
+        f32 tile_size[2];
+    } gsdl_grid_t;
+
+    void gsdl_init_grid(gsdl_grid_t * grid, u16 w, u16 h, u32 s_w, u32 s_h);
+    void gsdl_set_grid_px(gsdl_grid_t * grid, u32 x, u32 y, i16 val);
+    i16 gsdl_get_grid_px(gsdl_grid_t * grid, u32 x, u32 y);
+    void gsdl_destroy_grid(gsdl_grid_t * grid); 
+    i32 gsdl_draw_grid(gsdl_grid_t * g, SDL_Renderer * renderer, void (*grid_update)(gsdl_grid_t * grid, i16 cell, SDL_Rect rect, u32 x, u32 y, SDL_Renderer * renderer), u08 draw, i32 w, i32 h, i32 _x, i32 _y, SDL_Color * _colors);
 #endif

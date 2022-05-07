@@ -5,11 +5,9 @@ build ${OBJ_PATH}/menu.obj:    CC src/game/states/menu.c
 build ${OBJ_PATH}/player.obj:  CC src/game/states/behaviours/player.c 
 build ${OBJ_PATH}/lvl.obj:  CC src/game/states/behaviours/lvl.c 
 
-build ${OBJ_PATH}/engine.obj: CC src/game/engine/engine.c 
 build ${OBJ_PATH}/program.a: AR ${OBJ_PATH}/program.obj $
                              ${OBJ_PATH}/game.obj $
                              ${OBJ_PATH}/main.obj $
                              ${OBJ_PATH}/menu.obj $
                              ${OBJ_PATH}/player.obj $
-                             ${OBJ_PATH}/lvl.obj $
-                             ${OBJ_PATH}/engine.obj
+                             ${OBJ_PATH}/lvl.obj

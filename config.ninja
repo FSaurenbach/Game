@@ -1,5 +1,5 @@
 # available: M1, WIN, WEB
 PLATFORM=M1
-TARGET=game
+TARGET=art
 TERM_TYPE=ANSI
 # TERM_TYPE can be ANSI or NO_ANSI

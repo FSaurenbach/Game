@@ -25,6 +25,7 @@ i32 main(i32 argv, char ** args) {
     game = calloc(1, sizeof(gsdl_props_t));
     state = game_init(game);
 
+    //SDL_SetWindowBordered(game -> win, 0);
     if (!state) {
         logger_log(LOG_ERR, "Failed to initialize");
         return -1;
@@ -38,8 +39,6 @@ i32 main(i32 argv, char ** args) {
     free(game);
     free(state);
 
-    fflush(stdout);
-    printf("\n");
     logger_log(LOG_SUCCESS, "Successfully Exited");
     return 0;
 }

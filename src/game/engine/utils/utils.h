@@ -100,7 +100,7 @@
     #define pi 3.141592653589793238462643383279
     #define deg_to_rad(deg) deg * (pi / 180)
     #define rad_to_deg(rad) rad * (180 / pi)
-    #define sq(e) e * e
+    #define sq(e) (e) * (e)
 
     f32 dist2D(f32 x1, f32 y1, f32 x2, f32 y2);
     f32 dir2D(f32 x1, f32 y1, f32 x2, f32 y2);

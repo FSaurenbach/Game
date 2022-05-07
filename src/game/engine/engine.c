@@ -204,9 +204,9 @@ void gsdl_create_surf(gsdl_img_t * img, u32 w, u32 h, u08 r, u08 g, u08 b, u08 a
 
     for (i32 y = 0; y < h; y++) {
         for (i32 x = 0; x < w; x++) {
-            px[y * surface -> pitch + x * surface -> format -> BytesPerPixel + 2] = r;
             px[y * surface -> pitch + x * surface -> format -> BytesPerPixel + 0] = g;
             px[y * surface -> pitch + x * surface -> format -> BytesPerPixel + 1] = b;             
+            px[y * surface -> pitch + x * surface -> format -> BytesPerPixel + 2] = r;
         }
     }
     
@@ -753,6 +753,37 @@ void gsdl_deserialize_img(gsdl_img_t * img, const char * path, SDL_Renderer * re
     img -> serialized = 0;
 }
 
+void gsdl_color_px(SDL_Surface * surf, i32 x, i32 y, u08 r, u08 g, u08 b) {
+    SDL_LockSurface(surf);
+    u08 * pixels = surf -> pixels;
+    pixels[y * surf -> pitch + x * surf -> format -> BytesPerPixel + 0] = b;
+    pixels[y * surf -> pitch + x * surf -> format -> BytesPerPixel + 1] = g;             
+    pixels[y * surf -> pitch + x * surf -> format -> BytesPerPixel + 2] = r;
+    // format changes from platforms abvoe is for mac
+    // original one in engine.c
+
+    //u08 * px = pixels + y * surf -> pitch + x;
+    //*px = SDL_MapRGB(surf -> format, r, g, b);
+    SDL_UnlockSurface(surf);
+}
+
+SDL_Color gsdl_get_px_color(SDL_Surface * surf, i32 x, i32 y) {
+    SDL_Color color;
+    SDL_LockSurface(surf);
+    u08 * pixels = surf -> pixels;
+    color.r = pixels[y * surf -> pitch + x * surf -> format -> BytesPerPixel + 0];
+    color.g = pixels[y * surf -> pitch + x * surf -> format -> BytesPerPixel + 1];             
+    color.b = pixels[y * surf -> pitch + x * surf -> format -> BytesPerPixel + 2];
+    color.a = 255;
+    // format changes from platforms abvoe is for mac
+    // original one in engine.c
+
+    //u08 * px = pixels + y * surf -> pitch + x;
+    //*px = SDL_MapRGB(surf -> format, r, g, b);
+    SDL_UnlockSurface(surf);
+    return color;
+}
+
 void gsdl_init_particles(gsdl_particles_t * particles, u32 size, i32 delta) {
     particles -> arr = calloc(size, sizeof(gsdl_img_t));
     particles -> size = size;
@@ -804,4 +835,63 @@ void gsdl_destroy_particles(gsdl_particles_t * particles) {
     particles -> size = 0;
     particles -> delta = 0;
 }
+
+
+void gsdl_init_grid(gsdl_grid_t * g, u16 w, u16 h, u32 s_w, u32 s_h) {
+    g -> grid = calloc(w * h, sizeof(i16));
+    // matrix[ i ][ j ] = array[ i * m + j ] 
+    g -> size[0] = w;
+    g -> size[1] = h;
+    g -> actual_size = w * h;
+    g -> tile_size[0] = s_w / w;
+    g -> tile_size[1] = s_h / h;
+}
+
+void gsdl_set_grid_px(gsdl_grid_t * g, u32 x, u32 y, i16 val) {
+    if (x < g -> size[0] && y < g -> size[1]) {
+        g -> grid[y * g -> size[0] + x] = val;
+    }
+}
+
+i16 gsdl_get_grid_px(gsdl_grid_t * g, u32 x, u32 y) {
+    if (x < g -> size[0] && y < g -> size[1]) {
+        return g -> grid[y * g -> size[0] + x];
+    }
+    return -1;
+}
+void gsdl_destroy_grid(gsdl_grid_t * g) {
+    free(g -> grid);
+} 
+
+i32 gsdl_draw_grid(gsdl_grid_t * g, SDL_Renderer * renderer, void (*grid_update)(gsdl_grid_t * grid, i16 cell, SDL_Rect rect, u32 x, u32 y, SDL_Renderer * renderer), u08 draw, i32 w, i32 h, i32 _x, i32 _y, SDL_Color * _colors) {
+    g -> tile_size[0] = abs(w) / g -> size[0];
+    g -> tile_size[1] = abs(h) / g -> size[1];
+
+    SDL_Rect rect;
+    for (i32 y = _y; y < g -> size[1] + _y; y++) {
+        for (i32 x = _x; x < g -> size[0] + _x; x++) {
+            rect = (SDL_Rect) { lroundf(x * (g -> tile_size[0])), 
+                                lroundf(y * (g -> tile_size[1])), 
+                                lroundf(g -> tile_size[0]), 
+                                lroundf(g -> tile_size[1]) }; 
+
+            if (draw) {
+                i16 px = gsdl_get_grid_px(g, x - _x, y - _y);
+                if (px > -1) {
+                    SDL_Color color = _colors[px];
+                    gsdl_draw_rect(&rect, color.r, color.g, color.b, 255, renderer);
+                    gsdl_draw_rect_outline(&rect, color.r - 5, color.g - 5, color.b - 5, 255, renderer);
+                }
+
+                if (grid_update != NULL) {
+                    grid_update(g, px, rect, x - _x, y - _y, renderer);
+                }
+            }
+
+        }
+    }
+
+    return 1;
+}
+
 
