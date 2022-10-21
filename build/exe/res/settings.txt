@@ -1,0 +1,12 @@
+name: [UnR34lity];
+size: [1280, 720];
+fps: [60];
+vsync: [0];
+resizable: [1];
+move_left : [4, 80];
+move_right : [7, 79];
+shoot : [22, 81];
+jump : [44, 82];
+dash : [26];
+retry : [21];
+playing : [true];

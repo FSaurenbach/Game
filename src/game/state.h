@@ -8,12 +8,14 @@
     #define W_HALF       WIDTH/2 
     #define H_HALF       HEIGHT/2
     #define RENDERER_ACC 1
-    #define FPS          65 
-    #define VSYNC        1
+    #define FPS          60 
+    #define VSYNC        0
     #define RESIZABLE    1 
 
     #define MAX_MS_SIZE 40
     #define MAX_MEM_USED 120
+
+    #define PLAYER_ACTIONS 32 
 
     // implement rerun init function
     #define ARGS (gsdl_init_info_t) { TITLE, WIDTH, HEIGHT, RENDERER_ACC, FPS, VSYNC, RESIZABLE }
@@ -106,6 +108,8 @@
         i32 saved_dt_avg;
         i32 saved_mem_usage;
         i32 f_count;
+        
+        ht_t game_controls;
     } game_state_t;
 
 #endif

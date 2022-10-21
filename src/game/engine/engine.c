@@ -1,3 +1,5 @@
+#include "SDL2/SDL_pixels.h"
+#include "SDL2/SDL_surface.h"
 #include <engine.h>
 
 void gsdl_init(const gsdl_init_info_t init, gsdl_props_t * props) {
@@ -198,20 +200,15 @@ void gsdl_load_textures(gsdl_img_t * imgs, u16 frames, char * prefix, u32 x, u32
 
 void gsdl_create_surf(gsdl_img_t * img, u32 w, u32 h, u08 r, u08 g, u08 b, u08 a, list_t * surf_storage) {
     SDL_Surface * surface = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0);
-    SDL_LockSurface(surface);
-
-    u08 * px = (u08 *) surface -> pixels;
+    SDL_PixelFormat * format = SDL_AllocFormat(SDL_PIXELFORMAT_RGB24);
+    surface = SDL_ConvertSurface(surface, format, 0);
 
     for (i32 y = 0; y < h; y++) {
         for (i32 x = 0; x < w; x++) {
-            px[y * surface -> pitch + x * surface -> format -> BytesPerPixel + 0] = g;
-            px[y * surface -> pitch + x * surface -> format -> BytesPerPixel + 1] = b;             
-            px[y * surface -> pitch + x * surface -> format -> BytesPerPixel + 2] = r;
+            gsdl_color_px(surface, x, y, r, g, b); 
         }
-    }
+    } 
     
-    SDL_UnlockSurface(surface);
-
     if (surface == NULL) {
         logger_log(LOG_WARN, "Failed to make surface: %s", SDL_GetError());
     }
@@ -441,6 +438,8 @@ void gsdl_calc_cam_pos(gsdl_cam_t * cam, gsdl_props_t * props, gsdl_phys_obj_t *
         SDL_QueryTexture(target, &format, &access, &w, &h);
         // get render texture obj
     }
+    w = 1280;
+    h = 720;
 
     cam -> x += (i32) round((o -> pos.x - cam -> x - ((w * 0.5) - (tsx * 0.5))) / 10);
     cam -> y += (i32) round((o -> pos.y - cam -> y - ((h * 0.5) - (tsy * 0.5))) / 10); 
@@ -632,6 +631,7 @@ void gsdl_render_scale(f32 sx, f32 sy, SDL_Renderer * renderer) {
     SDL_RenderSetScale(renderer, sx, sy);
 }
 
+// You MUST get the dt at the start and end of each frame!
 void gsdl_end_render(gsdl_props_t * props) {
     SDL_Texture * render_target = SDL_GetRenderTarget(props -> renderer);
     if (!render_target) {
@@ -753,12 +753,85 @@ void gsdl_deserialize_img(gsdl_img_t * img, const char * path, SDL_Renderer * re
     img -> serialized = 0;
 }
 
+char ** gsdl_load_config_file(const char * path) {
+    file_info_t file = txt_file_query(path);
+    char * str = file.content;    
+
+    size_t words_in_str = 0;
+    for (size_t u = 0; u < strlen(str); u++) {
+        if (!isalnum(str[u]) && isalnum(str[u - 1]) && !isdigit(str[u]) && str[u] != '_') {
+            words_in_str++;
+        }
+        if (str[u] == ';') {
+            words_in_str++;
+        }
+    }
+
+    u64 * word_len = calloc(words_in_str, sizeof(u32));
+
+    u32 len = 0;
+    u32 w_count = 0;
+    for (size_t u = 0; u < strlen(str); u++) {
+        if (isalnum(str[u]) || str[u] == '_') {
+            len++;
+        }
+
+        if (str[u] == ';') {
+            len++;
+            word_len[w_count] = len;
+            len = 0;
+            w_count++;
+        }
+
+        if (!isalnum(str[u]) && str[u] != '_') {
+            word_len[w_count] = len;
+            len = 0;
+            if (isalnum(str[u - 1]) && str[u - 1] != '_') {
+                w_count++; 
+            }
+        }
+    }
+
+
+    char ** words = calloc(words_in_str, sizeof(char*));
+    for (size_t s = 0; s < words_in_str; s++) {
+        words[s] = calloc(word_len[s], sizeof(char));
+    }
+
+
+    size_t word_idx = 0; 
+    size_t word_char_idx = 0;
+    for (size_t u = 0; u < strlen(str); u++) {
+        if (isalnum(str[u]) || isdigit(str[u]) || str[u] == '_') {
+            words[word_idx][word_char_idx] = str[u];
+            word_char_idx++;
+        }  
+        if ((!isalnum(str[u]) && isalnum(str[u - 1])) && !isdigit(str[u]) && str[u] != '_' && str[u] != ';') {
+            if (word_idx < words_in_str) {
+                word_idx++;
+            }
+            word_char_idx = 0; 
+        }
+
+        if (str[u] == ';') {
+            words[word_idx][word_char_idx] = str[u];
+            word_char_idx++;           
+            if (word_idx < words_in_str) {
+                word_idx++;
+            }
+            word_char_idx = 0; 
+        }
+    }
+
+
+}
+
 void gsdl_color_px(SDL_Surface * surf, i32 x, i32 y, u08 r, u08 g, u08 b) {
     SDL_LockSurface(surf);
     u08 * pixels = surf -> pixels;
-    pixels[y * surf -> pitch + x * surf -> format -> BytesPerPixel + 0] = b;
+    pixels[y * surf -> pitch + x * surf -> format -> BytesPerPixel + 0] = r;
     pixels[y * surf -> pitch + x * surf -> format -> BytesPerPixel + 1] = g;             
-    pixels[y * surf -> pitch + x * surf -> format -> BytesPerPixel + 2] = r;
+    pixels[y * surf -> pitch + x * surf -> format -> BytesPerPixel + 2] = b;
     // format changes from platforms abvoe is for mac
     // original one in engine.c
 
@@ -880,7 +953,6 @@ i32 gsdl_draw_grid(gsdl_grid_t * g, SDL_Renderer * renderer, void (*grid_update)
                 if (px > -1) {
                     SDL_Color color = _colors[px];
                     gsdl_draw_rect(&rect, color.r, color.g, color.b, 255, renderer);
-                    gsdl_draw_rect_outline(&rect, color.r - 5, color.g - 5, color.b - 5, 255, renderer);
                 }
 
                 if (grid_update != NULL) {

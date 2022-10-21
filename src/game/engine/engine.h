@@ -5,7 +5,11 @@
     #include <SDL2/SDL_image.h>
     #include <SDL2/SDL_ttf.h>
     #include <SDL2/SDL_mixer.h>
-    //#include "sdl_gfx/.h"
+    #include "sdl_gfx/SDL2_framerate.h"
+    #include "sdl_gfx/SDL2_gfxPrimitives.h"
+    #include "sdl_gfx/SDL2_gfxPrimitives_font.h"
+    #include "sdl_gfx/SDL2_imageFilter.h"
+    #include "sdl_gfx/SDL2_rotozoom.h"
 
     i32 main(i32 argv, char ** args);
     #define SDL_main main
@@ -270,6 +274,8 @@
     void * gsdl_deserialize_bin(u64 size, const char * path);
     void gsdl_serialize_img(gsdl_img_t * img, char * file_name, SDL_Renderer * renderer);
     void gsdl_deserialize_img(gsdl_img_t * img, const char * path, SDL_Renderer * renderer, list_t * texture_storage, list_t * surf_storage);
+
+    char ** gsdl_load_config_file(const char * path);
 
 
     /*

@@ -4,9 +4,9 @@
 		{
 			"label": "Compile & Run",
 			"type": "shell",
-			"command": "bash",
+			"command": "",
 			"args": [
-				"${workspaceFolder}/tools/scripts/run.sh"
+				"${workspaceFolder}/tools/scripts/run.bat"
 			],
 			"problemMatcher": [],
 			"group": {

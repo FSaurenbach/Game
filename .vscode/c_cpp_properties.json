@@ -1,13 +1,13 @@
 {
     "env": {
         "myDefaultIncludePath": ["${workspaceFolder}/src/game", "${workspaceFolder}/src/game/engine", "${workspaceFolder}/src/game/engine/utils", "${workspaceFolder}/src/game/engine/SDL2", "${workspaceFolder}/src/game/states/behaviours"],
-        "myCompilerPath": "/usr/local/bin/gcc-7"
+        "myCompilerPath": "C:/MinGW/bin/gcc"
       },
       "configurations": [
         {
           "intelliSenseMode": "clang-x64",
           "includePath": ["${myDefaultIncludePath}"],
-          "compilerPath": "/usr/bin/clang",
+          "compilerPath": "C:/MinGW/bin/gcc",
           "cStandard": "c11",
           "browse": {
             "path": ["${workspaceFolder}/*"],

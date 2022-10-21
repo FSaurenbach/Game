@@ -10,6 +10,7 @@
     #include <stdint.h>
     #include <stddef.h>
     #include <string.h>
+    #include <ctype.h>
 
     typedef uint8_t  u08;
     typedef uint16_t u16;
@@ -151,4 +152,19 @@
     char * i32_to_str(i32 num);
     char * f64_to_str(f64 num);
     i32 str_to_i32(char * string);
+
+
+    typedef struct {
+        file_info_t file;
+        u64 len;
+        u32 max_elems_in_list;
+        u64 max_str_byte_size;
+        char ** data;
+        ht_t table;
+    } config_file_t;
+
+
+    config_file_t parse_config_file(const char * filepath);
+    void ** config_file_get(config_file_t * file, char * key);
+
 #endif

@@ -466,3 +466,136 @@ i32 str_to_i32(char * string) {
 }
 
 
+config_file_t parse_config_file(const char * filepath) {
+    config_file_t config = {0};
+    config.file = txt_file_query(filepath);
+    char * str = config.file.content;
+    for (u64 u = 0; u < strlen(str); u++) {
+        if (!isalnum(str[u]) && isalnum(str[u - 1]) && !isdigit(str[u]) && str[u] != '_') {
+            config.len++;
+        }
+        if (str[u] == ';') {
+            config.len++;
+        }
+    }
+    u32 * word_len = calloc(config.len, sizeof(u32));
+    
+    u32 len = 0;
+    u32 w_count = 0;
+    for (u64 u = 0; u < strlen(str); u++) {
+        if (isalnum(str[u]) || str[u] == '_') {
+            len++;
+        }
+
+        if (str[u] == ';' ) {
+            len++;
+            word_len[w_count] = len;
+            len = 0;
+            w_count++;
+        }
+
+        if (!isalnum(str[u]) && str[u] != '_') {
+            word_len[w_count] = len;
+            len = 0;
+            if (isalnum(str[u - 1]) && str[u - 1] != '_') {
+                w_count++; 
+            }
+        }
+    }
+
+    config.max_str_byte_size = 0;
+    for (u64 u = 0; u < w_count; u++) {
+        if (word_len[u] * sizeof(void*) > config.max_str_byte_size) {
+            config.max_str_byte_size = word_len[u] * sizeof(void*);
+        }
+    }
+
+
+    char ** words = calloc(config.len, sizeof(void*));
+    for (u64 s = 0; s < config.len; s++) {
+        // added max size in bytes as this is the biggest possible string
+        words[s] = calloc(word_len[s], config.max_str_byte_size); 
+    }
+    u64 word_idx = 0; 
+    u64 word_char_idx = 0;
+    for (u64 u = 0; u < strlen(str); u++) {
+        if (isalnum(str[u]) || isdigit(str[u]) || str[u] == '_') {
+            words[word_idx][word_char_idx] = str[u];
+            word_char_idx++;
+        }  
+        if ((!isalnum(str[u]) && isalnum(str[u - 1])) && !isdigit(str[u]) && str[u] != '_' && str[u] != ';') {
+            if (word_idx < config.len) {
+                word_idx++;
+            }
+            word_char_idx = 0; 
+        }
+
+        if (str[u] == ';') {
+            words[word_idx][word_char_idx] = str[u];
+            word_char_idx++;           
+            if (word_idx < config.len) {
+                word_idx++;
+            }
+            word_char_idx = 0; 
+        }
+    }
+
+    config.data = words;
+
+    u32 prev = 0;
+    config.max_elems_in_list = 0;
+    for (u32 u = 0; u < len; u++) {
+        if (config.data[u][0] != ';') {
+            config.max_elems_in_list++;
+        }
+        else {
+            if (config.max_elems_in_list > prev) {
+                prev = config.max_elems_in_list;
+                config.max_elems_in_list = 0;
+            }
+        }
+    }
+    config.max_elems_in_list = prev;
+    
+    if (config.len % 2 == 0) {
+        config.table = ht_create(config.len);
+    } else {
+        config.table = ht_create(config.len + 1);
+    }
+
+    char ** data = config.data;
+    len = config.len;
+    ht_t * table = &config.table;
+    u32 c_len = config.max_str_byte_size;
+    u32 max_elems = config.max_elems_in_list * config.len;
+
+    void ** tmp = NULL;
+    void ** target = NULL;
+
+    // used to be void*
+    tmp = calloc(max_elems, c_len);
+    for (u32 u = 0; u < len; u++) {
+        char * key = data[u];
+        u32 d_id = u + 1;
+        u32 curr_inp = 0;
+        while (data[d_id][0] != ';') {
+            tmp[curr_inp] = data[d_id];
+            curr_inp++;
+            d_id++;
+        }
+        target = calloc(curr_inp + 2, c_len);
+        target[0] = (void*) curr_inp + 1;
+        for (u32 n = 1; n < curr_inp + 1; n++) {
+            target[n] = (void*) tmp[n - 1];
+        }
+
+        ht_insert(table, key, target);
+        u += d_id - u;
+    }
+
+    return config; 
+}
+
+void ** config_file_get(config_file_t * file, char * key) {
+    return ht_get(&file -> table, key);
+}

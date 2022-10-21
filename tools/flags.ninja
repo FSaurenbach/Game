@@ -4,15 +4,17 @@ UTILS_PATH = src/game/engine/utils
 ENGINE_PATH = src/game/engine
 GAME_PATH = src/game
 BEHAVIOURS_PATH = src/game/states/behaviours
+SDL_GFX_PATH = src/game/engine/sdl_gfx
 
-#flags = -Wall -O3 -std=c11
-flags = -Wall -g -O0 -std=c99
+flags = -Wall -O3 -std=c11
+#flags = -Wall -g -O0 -std=c99
 libs = -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_mixer -lSDL2_image -lm
 
 INCLUDES = -I ${UTILS_PATH} $
            -I ${ENGINE_PATH} $
            -I ${SDL_PATH} $
            -I ${GAME_PATH} $
-           -I ${BEHAVIOURS_PATH}
+           -I ${BEHAVIOURS_PATH} $
+           -I ${SDL_GFX_PATH}
 
 

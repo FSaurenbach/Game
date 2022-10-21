@@ -8,6 +8,7 @@ void player_init(game_state_t * state, gsdl_props_t * props) {
     state -> player_img_data[3] = (gsdl_anim_data_t) { "jump", "res/player/jump/", 1, 0, 0 };
     state -> player_img_data[4] = (gsdl_anim_data_t) { "shoot", "res/player/shoot/", 1, 0, 0 };
 
+
     gsdl_init_animated_img(&state -> player_anim_img, state -> player_img_data, 5);
     gsdl_load_animations(&state -> player_anim_img, props -> renderer, &props -> texture_storage, &props -> ptr_storage, 255);
 
@@ -32,6 +33,7 @@ void player_init(game_state_t * state, gsdl_props_t * props) {
     state -> bullet_texture.angle = 45;
     gsdl_create_circle(&state -> bullet_circle, 0, 0, 0, 255, 100, 150, 255, 1);
     gsdl_create_circle(&state -> bullet_circle_outline, state -> bullets[state -> bullet_len].pos.x, state -> bullets[state -> bullet_len].pos.y, 0, 255, 255, 255, 255, 0);
+
 }
 
 void player_handle_events(game_state_t * state, gsdl_props_t * props) {
@@ -267,6 +269,7 @@ void player_update(game_state_t * state, gsdl_props_t * props) {
 }
 void player_render(game_state_t * state, gsdl_props_t * props) {
     for (u32 u = 0; u < GHOST_LIST_SIZE; u++) { 
+        SDL_SetTextureBlendMode(state -> player_prev_img.current_img.tex, SDL_BLENDMODE_ADD);
         gsdl_draw_phys_obj(&state -> player_prev_img.current_img, &state -> player_prev[u], &state -> camera, props -> renderer);
     }
 
@@ -276,10 +279,12 @@ void player_render(game_state_t * state, gsdl_props_t * props) {
     for (u32 u = 0; u < 50; u++) {
         gsdl_phys_obj_t obj = state -> bullets[u];
         gsdl_set_img_alpha((&state -> bullet_texture), state -> bullet_alpha[u]);
+        SDL_SetTextureBlendMode(state -> bullet_texture.tex, SDL_BLENDMODE_ADD);
         gsdl_draw_phys_obj(&state -> bullet_texture, &obj, &state -> camera, props -> renderer);
     }  
 
     gsdl_draw_circle(&state -> bullet_circle_outline, props -> renderer);
     gsdl_draw_circle(&state -> bullet_circle, props -> renderer);
 
+    
 }

@@ -1,12 +1,17 @@
 #include <game.h>
 
 game_state_t * game_init(gsdl_props_t * props) {
-    gsdl_init(ARGS, props);
+        config_file_t config = parse_config_file("res/settings.txt");
+        void ** data = config_file_get(&config, "name");
+        printf("%s\n", data[1]);
+    gsdl_init((gsdl_init_info_t) {data[1], WIDTH, HEIGHT, RENDERER_ACC, FPS, VSYNC, RESIZABLE}, props);
+
     game_state_t * state; 
 
     { // Game state initialization
         state = calloc(1, sizeof(game_state_t));
         state -> g_state = 0;
+
         SDL_SetWindowMinimumSize(props -> win, WIDTH, HEIGHT);
         //SDL_SetWindowMaximumSize(props -> win, 2560, 1440);
         state -> integer_str = calloc(24, sizeof(char));
@@ -15,7 +20,8 @@ game_state_t * game_init(gsdl_props_t * props) {
 
     { // Actual game stuff
         //state -> player_animations;
-
+        state -> game_controls = ht_create(PLAYER_ACTIONS);
+        
     }
 
     { // Transition
@@ -91,3 +97,15 @@ void game_cleanup(gsdl_props_t * props, game_state_t * state) {
 
     gsdl_destroy(props);    
 }
+
+/* hw 
+
+    chem--
+    urdu
+    world history
+    physics--
+    design
+    ps 1--
+    business--
+
+*/
