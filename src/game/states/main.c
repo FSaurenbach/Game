@@ -120,11 +120,11 @@ void main_render(gsdl_props_t * props, game_state_t * state) {
     gsdl_render_all(props, cBLACK, &state -> render_texture, &state -> render_texture_obj, NULL, 1, WIDTH, HEIGHT);
 }
 void main_loop(gsdl_props_t * props, game_state_t * state) { 
+    gsdl_start_frame_time_rec(props);
         // Handle events
         main_handle_events(props, state);
         // Update
         main_update(props, state);
-    gsdl_start_frame_time_rec(props);
         // Rendering
         main_render(props, state); 
     gsdl_stop_frame_time_rec(props);

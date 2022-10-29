@@ -3,7 +3,7 @@
     #include <engine.h>
 
     #define TITLE "UnR34lity"
-    #define WIDTH        1280 
+    #define WIDTH        1280
     #define HEIGHT       720
     #define W_HALF       WIDTH/2 
     #define H_HALF       HEIGHT/2

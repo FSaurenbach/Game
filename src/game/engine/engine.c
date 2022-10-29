@@ -60,6 +60,9 @@ void gsdl_init(const gsdl_init_info_t init, gsdl_props_t * props) {
         props -> curr_dt = 0;
         props -> texture_storage = list_create(75);
         props -> ptr_storage = list_create(75);
+        props -> i_w = init.w;
+        props -> i_h = init.h;
+
     }
 }
 
@@ -437,9 +440,9 @@ void gsdl_calc_cam_pos(gsdl_cam_t * cam, gsdl_props_t * props, gsdl_phys_obj_t *
         i32 access;
         SDL_QueryTexture(target, &format, &access, &w, &h);
         // get render texture obj
-    }
-    w = 1280;
-    h = 720;
+    } 
+    w = props -> i_w;
+    h = props -> i_h;
 
     cam -> x += (i32) round((o -> pos.x - cam -> x - ((w * 0.5) - (tsx * 0.5))) / 10);
     cam -> y += (i32) round((o -> pos.y - cam -> y - ((h * 0.5) - (tsy * 0.5))) / 10); 
@@ -753,78 +756,6 @@ void gsdl_deserialize_img(gsdl_img_t * img, const char * path, SDL_Renderer * re
     img -> serialized = 0;
 }
 
-char ** gsdl_load_config_file(const char * path) {
-    file_info_t file = txt_file_query(path);
-    char * str = file.content;    
-
-    size_t words_in_str = 0;
-    for (size_t u = 0; u < strlen(str); u++) {
-        if (!isalnum(str[u]) && isalnum(str[u - 1]) && !isdigit(str[u]) && str[u] != '_') {
-            words_in_str++;
-        }
-        if (str[u] == ';') {
-            words_in_str++;
-        }
-    }
-
-    u64 * word_len = calloc(words_in_str, sizeof(u32));
-
-    u32 len = 0;
-    u32 w_count = 0;
-    for (size_t u = 0; u < strlen(str); u++) {
-        if (isalnum(str[u]) || str[u] == '_') {
-            len++;
-        }
-
-        if (str[u] == ';') {
-            len++;
-            word_len[w_count] = len;
-            len = 0;
-            w_count++;
-        }
-
-        if (!isalnum(str[u]) && str[u] != '_') {
-            word_len[w_count] = len;
-            len = 0;
-            if (isalnum(str[u - 1]) && str[u - 1] != '_') {
-                w_count++; 
-            }
-        }
-    }
-
-
-    char ** words = calloc(words_in_str, sizeof(char*));
-    for (size_t s = 0; s < words_in_str; s++) {
-        words[s] = calloc(word_len[s], sizeof(char));
-    }
-
-
-    size_t word_idx = 0; 
-    size_t word_char_idx = 0;
-    for (size_t u = 0; u < strlen(str); u++) {
-        if (isalnum(str[u]) || isdigit(str[u]) || str[u] == '_') {
-            words[word_idx][word_char_idx] = str[u];
-            word_char_idx++;
-        }  
-        if ((!isalnum(str[u]) && isalnum(str[u - 1])) && !isdigit(str[u]) && str[u] != '_' && str[u] != ';') {
-            if (word_idx < words_in_str) {
-                word_idx++;
-            }
-            word_char_idx = 0; 
-        }
-
-        if (str[u] == ';') {
-            words[word_idx][word_char_idx] = str[u];
-            word_char_idx++;           
-            if (word_idx < words_in_str) {
-                word_idx++;
-            }
-            word_char_idx = 0; 
-        }
-    }
-
-
-}
 
 void gsdl_color_px(SDL_Surface * surf, i32 x, i32 y, u08 r, u08 g, u08 b) {
     SDL_LockSurface(surf);

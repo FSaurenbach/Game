@@ -53,6 +53,8 @@
         const u08 * keys_pressed;
         list_t texture_storage;
         list_t ptr_storage;
+        i32 i_w;
+        i32 i_h;
     } gsdl_props_t;
 
     void gsdl_init(const gsdl_init_info_t init, gsdl_props_t * props);

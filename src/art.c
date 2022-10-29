@@ -8,6 +8,7 @@
 
 // implement creating colors
 // fix problem with different surface formats changing how color is loaded
+// fix problem with wrong offset
 
 void grid_update(gsdl_grid_t * grid, i16 cell, SDL_Rect rect, u32 x, u32 y, SDL_Renderer * renderer) {
     if (cell == -1) {
@@ -42,7 +43,7 @@ i32 main(i32 argv, char ** args) {
     i32 w = 680;
     i32 h = 720;
 
-    i32 bordered = 0;
+    i32 bordered = 1;
     SDL_SetWindowBordered(props.win, bordered);
     u08 draw_tools = 1;
     
@@ -82,12 +83,15 @@ i32 main(i32 argv, char ** args) {
     i32 current_color = 0;
     
     gsdl_phys_obj_t mouse;
+    gsdl_phys_obj_t mouse_two;
     i32 mx = 0, my = 0;
     gsdl_create_phys_obj(&mouse, mk_v2(0, 0), mk_v2(0, 0), grid.tile_size[0], grid.tile_size[1]);
+    gsdl_create_phys_obj(&mouse_two, mk_v2(0, 0), mk_v2(0, 0), 1, 1);
     u08 drawing = 0;
 
-    i32 x_idx;
-    i32 y_idx;
+    i32 x_idx = 0;
+    i32 y_idx = 0;
+    logger_log(LOG_SUCCESS, "working");
 
     // implement mouse button down record x
     // implement up stop recoridng
@@ -226,13 +230,16 @@ i32 main(i32 argv, char ** args) {
 
         mouse.pos.x = mx; // - mouse.w / 2;
         mouse.pos.y = my; //  - mouse.h / 2;
+        mouse_two.pos.x = mx;
+        mouse_two.pos.y = my;
         x_idx = mouse.pos.x / grid.tile_size[0];
         y_idx = mouse.pos.y / grid.tile_size[1];
 
+
         if ((mbtn & SDL_BUTTON_LMASK)) {
-            if (gsdl_phys_obj_coll_detect(mouse, tool_bar) && draw_tools) {
+            if (gsdl_phys_obj_coll_detect(mouse_two, tool_bar) && draw_tools) {
                 for (u32 u = 0; u < color_obj_len; u++) {
-                    if (gsdl_phys_obj_coll_detect(mouse, color_obj[u])) {
+                    if (gsdl_phys_obj_coll_detect(mouse_two, color_obj[u])) {
                         current_color = u;
                     }
                 }
@@ -242,9 +249,9 @@ i32 main(i32 argv, char ** args) {
             }           
         }  
         if ((mbtn & SDL_BUTTON_RMASK)) {
-            if (gsdl_phys_obj_coll_detect(mouse, tool_bar) && draw_tools) {
+            if (gsdl_phys_obj_coll_detect(mouse_two, tool_bar) && draw_tools) {
                 for (u32 u = 0; u < color_obj_len; u++) {
-                    if (gsdl_phys_obj_coll_detect(mouse, color_obj[u])) {
+                    if (gsdl_phys_obj_coll_detect(mouse_two, color_obj[u])) {
                         current_color = u;
                     }
                 }

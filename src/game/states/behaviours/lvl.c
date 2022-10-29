@@ -112,7 +112,9 @@ void lvl_render(game_state_t * state, gsdl_props_t * props) {
         obj.w = TSX;
         obj.h = TSY;
         // or 1280/(64 * (0.75 * (1280/720))) ->  SW/TSX
-        if (state -> player.pos.x - (15 * TSX) < obj.pos.x && obj.pos.x < state -> player.pos.x + (15 * TSX)) {
+        // 15 tiles render
+        i32 r_dst = 14;
+        if (state -> player.pos.x - (r_dst * TSX) < obj.pos.x && obj.pos.x < state -> player.pos.x + (r_dst * TSX)) {
             if (state -> lvls[state -> current_map].map.content[u] == '1' || state -> lvls[state -> current_map].map.content[u] == '2') {
                 gsdl_draw_phys_obj_rect(&obj, 255, obj.pos.x * 2, 100, 255, &state -> camera, props -> renderer);
             }

@@ -6,8 +6,7 @@ game_state_t * game_init(gsdl_props_t * props) {
         printf("%s\n", data[1]);
     gsdl_init((gsdl_init_info_t) {data[1], WIDTH, HEIGHT, RENDERER_ACC, FPS, VSYNC, RESIZABLE}, props);
 
-    game_state_t * state; 
-
+    game_state_t * state;
     { // Game state initialization
         state = calloc(1, sizeof(game_state_t));
         state -> g_state = 0;
@@ -97,15 +96,3 @@ void game_cleanup(gsdl_props_t * props, game_state_t * state) {
 
     gsdl_destroy(props);    
 }
-
-/* hw 
-
-    chem--
-    urdu
-    world history
-    physics--
-    design
-    ps 1--
-    business--
-
-*/
